@@ -6,8 +6,8 @@
     tools:context=".Game">
 
     <GridLayout
-        android:layout_width="160dp"
-        android:layout_height="80dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="61dp"
@@ -21,7 +21,7 @@
             android:id="@+id/imageView2"
             android:layout_row="0"
             android:layout_column="0"
-            android:src="@mipmap/greenBlock75" />
+        />
 
         <ImageView
             android:layout_width="wrap_content"
@@ -29,15 +29,47 @@
             android:id="@+id/imageView3"
             android:layout_row="0"
             android:layout_column="2"
-            android:src="@mipmap/redBlock75" />
+            />
     </GridLayout>
 
     <GridLayout
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/displayGrid"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="33dp"
         android:id="@+id/buttonGrid"></GridLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/additonText"
+        android:text="afafds"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/levelTextView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/clickCounterTextView"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp" />
 
 </RelativeLayout>

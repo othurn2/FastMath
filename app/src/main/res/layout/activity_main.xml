@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView"
-        android:src="@mipmap/fastMathWBackground300"
+        android:src="@mipmap/fastmathbackground300"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
@@ -24,17 +24,18 @@
         android:layout_below="@+id/imageView"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="37dp"
-        android:src="@mipmap/playButton"
+        android:src="@mipmap/playbutton"
         android:background="#bfe2dd"
-        android:id="@+id/imageButton2" />
+        android:id="@+id/playButton" />
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/imageButton"
-        android:src="@mipmap/quitButton"
+        android:id="@+id/quitButton"
+        android:src="@mipmap/quitbutton"
         android:background="#bfe2dd"
-        android:layout_below="@+id/imageButton2"
-        android:layout_centerHorizontal="true" />
+        android:layout_below="@+id/playButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp" />
 
 </RelativeLayout>
