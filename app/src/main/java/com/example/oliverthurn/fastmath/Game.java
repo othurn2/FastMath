@@ -1,8 +1,12 @@
 package com.example.oliverthurn.fastmath;
 
+import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
+import android.animation.TypeEvaluator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Notification;
 import android.content.Intent;
@@ -10,7 +14,10 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HardwarePropertiesManager;
+import android.renderscript.Sampler;
 import android.text.Layout;
+import android.transition.Transition;
+import android.transition.TransitionValues;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ActionMode;
@@ -21,6 +28,7 @@ import android.view.ViewPropertyAnimator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
 import android.view.animation.RotateAnimation;
 import android.view.animation.Transformation;
 import android.view.animation.TranslateAnimation;
@@ -33,13 +41,17 @@ import org.w3c.dom.Text;
 
 import java.io.IOError;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
 /**
  * Created by oliverthurn on 10/4/16.
  */
-public class Game extends Activity implements View.OnClickListener{
+public class Game extends Activity implements View.OnClickListener  {
+
+
 
     private final float textSize = 50;
     private final float smallerTextSize = 35;
@@ -72,6 +84,9 @@ public class Game extends Activity implements View.OnClickListener{
     protected TextView clickCounterView;
 
     private final int[] blockImages = {R.drawable.blueblock75, R.drawable.greenblock75, R.drawable.redblock75, R.drawable.yellowblock75};
+
+    private final int[] blockImages150 = {R.drawable.blueblock150, R.drawable.greenblock150, R.drawable.redblock150, R.drawable.yellowblock150};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,7 +166,7 @@ public class Game extends Activity implements View.OnClickListener{
         Log.i("displaytextlength", "" + displayText.length());
 
         Random random = new Random();
-        int numToGet = random.nextInt(blockImages.length);
+        int numToGet = random.nextInt(blockImages150.length);
 
         for (int i = 0; i < digits; i++){
 
@@ -256,6 +271,7 @@ public class Game extends Activity implements View.OnClickListener{
                         clickText = Integer.toString(clickCounter);
                         clickCounterView.setText(clickText);
                         button.setClickable(false);
+                        button.animate().alpha(0);
                         checkForMatch();
 
                     }
@@ -278,13 +294,7 @@ public class Game extends Activity implements View.OnClickListener{
             createButtonGrid(highestNum * ((level + 1) / 2));
             createAdditionDisplay();
         } else if (score > displayNum){
-
-            //additionTextView.animate().x(screenX / 2).y((screenY/ 2)).setDuration(1000).start();
-            createAnimationBlockMove(additionTextView);
-            //Animation moveAnswer = AnimationUtils.loadAnimation(this, R.anim.additionbuttonanimation);
-            // additionTextView.startAnimation(moveAnswer);
-
-            //createAnimation(additionTextView);
+            createAnimation(additionTextView);
             level = 0;
             //levelText = levelText + level;
             levelTextView.setText(levelText + level);
@@ -300,73 +310,53 @@ public class Game extends Activity implements View.OnClickListener{
         }
     }
 
-    public void createAnimationBlockMove(View view) {
+    /** public void createAnimationMove(View view)
+     *
+     * @param view - the view manipulated. Any view that comes from View.
+     *
+     *  Uses a ViewPropertyAnimator to change the x and y position of the view.
+     *  Then rotates 360 degrees
+     *  Attempts to put object back in its original spot
+     *
+     * */
+
+
+    public void createAnimation(View view){
+
 
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
 
 
-        float originalX = (float) view.getX();
-        float originalY = (float) view.getY();
+        final float originalX = view.getX();
+        final float originalY = view.getY();
 
         final float screenX = (float) dm.widthPixels;
         final float screenY = (float) dm.heightPixels;
 
-       final ViewPropertyAnimator b = view.animate();
-        Runnable endAction = new Runnable() {
+        float moveToX = ((screenX / 2) - (view.getWidth() / 2));
+        float moveToY = ((screenY / 2) - (view.getHeight() / 2));
 
-            public void run() {
-                //b.animate().x(screenX).y(screenY).setDuration(1800);
-            }
-        };
+        AnimatorSet translateAnimatorSet = new AnimatorSet();
 
-        final ViewPropertyAnimator a = view.animate().x(originalX).y(screenY / 2).setDuration(2000).rotation(360).setDuration(1800).withEndAction(endAction);
+        ValueAnimator translateToX = ObjectAnimator.ofFloat(view, "X", moveToX);
+        translateToX.setDuration(2000);
 
-        //ViewPropertyAnimator b = view.animate().rotation(360);
-        //ViewPropertyAnimator c = view.animate().x(view.getX() + originalX).y(screenY / 2).setStartDelay(4000);
-        //ViewPropertyAnimator d = view.animate().translationX(originalX).translationY(originalY);
+        ValueAnimator translateToY = ObjectAnimator.ofFloat(view, "Y", moveToY);
+        translateToY.setDuration(2000);
 
+        ValueAnimator rotateView = ObjectAnimator.ofFloat(view, "Rotation", 360);
+        rotateView.setDuration(2000);
 
-    }
+        ValueAnimator backToX = ObjectAnimator.ofFloat(view, "X", originalX);
+        backToX.setDuration(1000);
+        ValueAnimator backToY = ObjectAnimator.ofFloat(view, "Y", originalY);
+        backToY.setDuration(1000);
 
-    public void createAnimation(View view){
+        translateAnimatorSet.play(translateToX).with(translateToY).with(rotateView);
+        translateAnimatorSet.play(backToX).with(backToY).after(rotateView);
 
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-
-        float originalX = view.getX();
-        float originalY = view.getY();
-
-        float screenX = (float) dm.widthPixels;
-        float screenY = (float) dm.heightPixels;
-
-        AnimationSet animationSet = new AnimationSet(false);
-        Animation animations = new TranslateAnimation(originalX, screenX / 2, originalY, screenY / 2);
-        animations.setDuration(4000);
-        animations.setFillAfter(false);
-        //view.setAnimation(animations);
-
-        TranslateAnimation trans = new TranslateAnimation(Animation.ABSOLUTE, ((screenX / 2) + (view.getWidth() / 2)),Animation.ABSOLUTE,  originalX, Animation.ABSOLUTE, ((screenY / 2) + view.getHeight()/ 2), Animation.ABSOLUTE, originalY);
-        trans.setDuration(1800);
-
-        RotateAnimation rotation = new RotateAnimation(0, 360);
-        rotation.setDuration(2000);
-
-        TranslateAnimation transTwo = new TranslateAnimation(view.getX(), view.getY(), view.getY(), originalY);
-        transTwo.setDuration(1800);
-       // transTwo.setStartOffset(4000);
-
-        animationSet.addAnimation(animations);
-       // animationSet.addAnimation(rotation);
-
-        view.setAnimation(animationSet);
-
-
-        //rotation.start();
-
-
-
+        translateAnimatorSet.start();
     }
 
 
