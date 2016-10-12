@@ -18,6 +18,7 @@ import android.renderscript.Sampler;
 import android.text.Layout;
 import android.transition.Transition;
 import android.transition.TransitionValues;
+import android.transition.Visibility;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ActionMode;
@@ -36,6 +37,7 @@ import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ViewAnimator;
 
 import org.w3c.dom.Text;
 
@@ -75,6 +77,7 @@ public class Game extends Activity implements View.OnClickListener  {
 
     // Variables for clickCounter
     protected int clickCounter;
+    protected int sinceWinClickCounter;
     protected String clickText;
 
     protected GridLayout numDisplayGrid;
@@ -82,6 +85,7 @@ public class Game extends Activity implements View.OnClickListener  {
     protected TextView additionTextView;
     protected TextView levelTextView;
     protected TextView clickCounterView;
+    protected TextView scorePlus;
 
     private final int[] blockImages = {R.drawable.blueblock75, R.drawable.greenblock75, R.drawable.redblock75, R.drawable.yellowblock75};
 
@@ -99,15 +103,15 @@ public class Game extends Activity implements View.OnClickListener  {
         additionTextView = (TextView)findViewById(R.id.additonText);
         levelTextView = (TextView)findViewById(R.id.levelTextView);
         clickCounterView = (TextView)findViewById(R.id.clickCounterTextView);
+        scorePlus = (TextView)findViewById(R.id.scorePlusView);
 
         highestNum = 99;
         level = 0;
         clickCounter = 0;
-        boolean play = true;
 
-        //playGame(play);
 
         generateRandom(highestNum);
+        createScorePlusView();
         createNumDisplayGrid(highestNum);
         createButtonGrid(highestNum);
         createAdditionDisplay();
@@ -131,6 +135,17 @@ public class Game extends Activity implements View.OnClickListener  {
      * for less than the number of digits create that many textViews with backgrounds that are the
      * blocks, then add a number to them.
      */
+
+
+    public void createScorePlusView(){
+
+        scorePlus.setText("");
+        scorePlus.setTextColor(textColor);
+        scorePlus.setTextSize(smallerTextSize);
+       // scorePlus.setBackgroundResource(R.drawable.whiteandblack10040);
+        //scorePlus.animate().alpha(1);
+
+    }
 
     public void createNumDisplayGrid(int high){
         int digits = -1;
@@ -168,38 +183,22 @@ public class Game extends Activity implements View.OnClickListener  {
         Random random = new Random();
         int numToGet = random.nextInt(blockImages150.length);
 
-        for (int i = 0; i < digits; i++){
 
-            String holder = "";
-            // Setting up blocks for grid
+        String holder = Integer.toString(displayNum);
+        Log.i("Info Holder", holder);
 
-            if(displayNum < 10) {
-                holder = Integer.toString(displayNum);
-            } else if (displayNum >= 10){
-                    if( i == 0){
-                        holder = displayText.substring(i, i+1);
-                        } else if (i == 1){
-                        holder = displayText.substring(i, i + 1);
-                            } else if ( i == 2){
-                            holder = displayText.substring(i);
-                            }
-            }
+        TextView textView = new TextView(this);
+        textView.setBackgroundResource(blockImages150[numToGet]);
 
-            Log.i("Info Holder", holder);
+        // Setting text in image
+        textView.setTextSize(textSize);
+        textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        textView.setTextColor(textColor);
 
-            TextView textView = new TextView(this);
-            textView.setBackgroundResource(blockImages[numToGet]);
+        // Setting that char into text
+        textView.setText(holder);
 
-            // Setting text in image
-            textView.setTextSize(textSize);
-            textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            textView.setTextColor(textColor);
-
-            // Setting that char into text
-            textView.setText(holder);
-
-            numDisplayGrid.addView(textView,i);
-        }
+        numDisplayGrid.addView(textView);
     }
 
 
@@ -209,7 +208,6 @@ public class Game extends Activity implements View.OnClickListener  {
         }
 
     public void createClickCounterDisplay(){
-        //clickCounterView.setBackgroundResource(R.drawable.whiteandblack10040);
         clickCounterView.setTextColor(textColor);
         clickCounterView.setTextSize(smallerTextSize);
         clickCounterView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
@@ -268,6 +266,7 @@ public class Game extends Activity implements View.OnClickListener  {
                         additionTextView.setText(Integer.toString(score));
                         Log.i("Info", "was pressed");
                         clickCounter++;
+                        sinceWinClickCounter++;
                         clickText = Integer.toString(clickCounter);
                         clickCounterView.setText(clickText);
                         button.setClickable(false);
@@ -284,23 +283,30 @@ public class Game extends Activity implements View.OnClickListener  {
     }
 
     public void checkForMatch() {
+
         if (score == displayNum){
             level++;
             //levelText = levelText + level;
             levelTextView.setText(levelText + level);
             score = 0;
             displayNum = 0;
+            createScoreViewAnimation(scorePlus);
             createNumDisplayGrid((highestNum * ((level + 1 )/ 2)));
             createButtonGrid(highestNum * ((level + 1) / 2));
             createAdditionDisplay();
+            sinceWinClickCounter = 0;
+            //scorePlus.setText("+" + sinceWinClickCounter);
+
         } else if (score > displayNum){
-            createAnimation(additionTextView);
+
+            createAdditionViewAnimation(additionTextView);
             level = 0;
             //levelText = levelText + level;
             levelTextView.setText(levelText + level);
             score = 0;
             displayNum = 0;
             clickCounter = 0;
+            sinceWinClickCounter = 0;
             clickText = Integer.toString(clickCounter);
             clickCounterView.setText(clickText);
             createNumDisplayGrid(highestNum);
@@ -321,7 +327,7 @@ public class Game extends Activity implements View.OnClickListener  {
      * */
 
 
-    public void createAnimation(View view){
+    public void createAdditionViewAnimation(View view){
 
 
         DisplayMetrics dm = new DisplayMetrics();
@@ -357,6 +363,69 @@ public class Game extends Activity implements View.OnClickListener  {
         translateAnimatorSet.play(backToX).with(backToY).after(rotateView);
 
         translateAnimatorSet.start();
+    }
+
+    public void createScoreViewAnimation(TextView view) {
+
+        view.setText("+" + Integer.toString(sinceWinClickCounter));
+        view.animate().alpha(1);
+
+        float originalX = view.getX();
+        float originalY = view.getY();
+
+        Log.i("ScoreViewOGX", "" + originalX);
+        Log.i("ScoreViewOGY", "" + originalY);
+
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+        final float endX = (float) dm.widthPixels;
+        final float endY = (float) dm.heightPixels;
+
+        AnimatorSet scoreViewSet = new AnimatorSet();
+
+
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(view, "ScaleX", 0);
+        scaleX.setDuration(1000);
+
+        ObjectAnimator scaleBackX = ObjectAnimator.ofFloat(view, "ScaleX", 1);
+        scaleX.setDuration(500);
+
+        ObjectAnimator moveUpX = ObjectAnimator.ofFloat(view, "X", (endX / 2));
+        moveUpX.setDuration(1000);
+
+        ObjectAnimator moveUpY = ObjectAnimator.ofFloat(view, "Y", (endY / 3) * 2);
+        moveUpY.setDuration(1000);
+
+        ObjectAnimator moveToX = ObjectAnimator.ofFloat(view, "X", endX);
+        moveToX.setDuration(1000);
+
+        ObjectAnimator moveToY = ObjectAnimator.ofFloat(view, "Y", endY);
+        moveToY.setDuration(1000);
+
+        ObjectAnimator setAlphaBack = ObjectAnimator.ofFloat(view, "Alpha", 1);
+        setAlphaBack.setDuration(500);
+
+        ObjectAnimator backToX = ObjectAnimator.ofFloat(view, "X", originalX);
+        backToX.setDuration(0);
+
+        ObjectAnimator backToY = ObjectAnimator.ofFloat(view, "Y", originalY);
+        backToY.setDuration(0);
+
+        ObjectAnimator vis = ObjectAnimator.ofFloat(view, "Visibility", 0);
+
+        scoreViewSet.play(moveUpX).with(moveUpY);
+        scoreViewSet.play(moveToX).with(moveToY).after(moveUpY);
+        scoreViewSet.play(backToX).with(backToY).after(moveToY);
+
+        scoreViewSet.start();
+        //view.clearAnimation();
+
+        Log.i("ScoreViewAfter", "" + view.getX());
+        Log.i("ScoreViewAfter", "" + view.getY());
+        Log.i("ScoreViewAfter", "Visibility " + view.getVisibility());
+
+ 
     }
 
 
