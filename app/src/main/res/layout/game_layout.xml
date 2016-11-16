@@ -49,7 +49,7 @@
         android:text="afafds"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp" />
+        android:layout_marginBottom="100dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -83,5 +83,33 @@
         android:layout_alignParentStart="true"
         android:layout_marginLeft="10dp"
         android:layout_marginBottom="10dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/silverMedalView"
+        android:layout_above="@+id/additonText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/silvermedal50" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/goldMedalView"
+        android:layout_above="@+id/additonText"
+        android:layout_toStartOf="@+id/silverMedalView"
+        android:layout_toLeftOf="@+id/silverMedalView"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/goldmedal50" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/bronzeMedalView"
+        android:layout_above="@+id/additonText"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/bronzemedal50"
+        android:layout_toRightOf="@+id/silverMedalView" />
 
 </RelativeLayout>

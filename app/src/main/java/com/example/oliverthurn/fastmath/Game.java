@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.app.Notification;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HardwarePropertiesManager;
@@ -22,6 +23,7 @@ import android.transition.Visibility;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ActionMode;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -86,6 +88,15 @@ public class Game extends Activity implements View.OnClickListener  {
     protected TextView levelTextView;
     protected TextView clickCounterView;
     protected TextView scorePlus;
+    protected ImageView goldMedal;
+    protected ImageView silverMedal;
+    protected ImageView bronzeMedal;
+
+
+    // booleans for determining if how many buttons have to be pressed to add to the number
+    protected static boolean twoMatch = false;
+    protected static boolean threeMatch = false;
+    protected static boolean fourMatch = false;
 
     private final int[] blockImages = {R.drawable.blueblock75, R.drawable.greenblock75, R.drawable.redblock75, R.drawable.yellowblock75};
 
@@ -104,6 +115,13 @@ public class Game extends Activity implements View.OnClickListener  {
         levelTextView = (TextView)findViewById(R.id.levelTextView);
         clickCounterView = (TextView)findViewById(R.id.clickCounterTextView);
         scorePlus = (TextView)findViewById(R.id.scorePlusView);
+
+        silverMedal = (ImageView)findViewById(R.id.silverMedalView); // Sets the medals on the screen but invisible at the creation time
+        silverMedal.setAlpha(0);
+        bronzeMedal = (ImageView)findViewById(R.id.bronzeMedalView);
+        bronzeMedal.setAlpha(0);
+        goldMedal = (ImageView)findViewById(R.id.goldMedalView);
+        goldMedal.setAlpha(0);
 
         highestNum = 99;
         level = 0;
@@ -142,15 +160,13 @@ public class Game extends Activity implements View.OnClickListener  {
         scorePlus.setText("");
         scorePlus.setTextColor(textColor);
         scorePlus.setTextSize(smallerTextSize);
-       // scorePlus.setBackgroundResource(R.drawable.whiteandblack10040);
-        //scorePlus.animate().alpha(1);
 
     }
 
     public void createNumDisplayGrid(int high){
         int digits = -1;
         Random randDisplay = new Random();
-        displayNum = randDisplay.nextInt(high) + 1;
+        displayNum = randDisplay.nextInt(high) + 10;
         finalDisplayNumber = displayNum;
         String highString = Integer.toString(high);
 
@@ -164,12 +180,12 @@ public class Game extends Activity implements View.OnClickListener  {
             digits = 3;
         }
 
+
+
         Log.i("Info: randDisplayNum", "" + displayNum);
         displayText = Integer.toString(displayNum);
         Log.i("Info: displayText", displayText);
         Log.i("displaytextlength", "" + displayText.length());
-
-
 
         numDisplayGrid.removeAllViews();
         numDisplayGrid.setRowCount(1);
@@ -216,20 +232,96 @@ public class Game extends Activity implements View.OnClickListener  {
     }
 
     public void createAdditionDisplay(){
+
+        //additionTextView.setBottom((int)additionDisplayY);
         additionTextView.setBackgroundResource(R.drawable.goldblock75);
         additionTextView.setTextColor(textColor);
         additionTextView.setTextSize(textSize);
         additionTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         additionTextView.setText(Integer.toString(score));
-
     }
 
     public void createLevelDisplay(){
-        //levelTextView.setBackgroundResource(R.drawable.whiteandblack10040);
         levelTextView.setTextSize(smallerTextSize);
         levelTextView.setTextColor(textColor);
         levelTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         levelTextView.setText(levelText + level);
+
+    }
+
+    /**
+     * Bubble sort method to be used inside of the createButtonGrid
+     * */
+
+    public static void bubble(int[] array){
+
+        for(int count = 0; count < array.length - 1; count++){
+            boolean swapped = false;
+
+            for(int i = 1; i < array.length; i++){
+                int a = array[i-1];
+                int b = array[i];
+                if (a < b ){
+                    int c = a;
+                    array[i-1] = b;
+                    array[i] = c;
+                    swapped = true;
+                }
+            }
+            if(!swapped){
+                break;
+            }
+        }
+    }
+
+    /**
+     * method to find a match in the array used to sort the grid numbers
+     * */
+
+    public static void findAdditionMatch(int[] array, int match){
+
+        for(int i = 0; i < array.length - 3; i++){
+            int a = array[i];
+            if(twoMatch && threeMatch){
+                break;
+            }
+            for(int j = 1; j < array.length - 2; j++){
+                int b = array[j];
+                if (a + b == match){
+                    //Log.i("MyInfo"," There is a match in a + b");
+                    twoMatch = true;
+                }
+                if(twoMatch && threeMatch && fourMatch){
+                    break;
+                }
+                    for (int k = 2; k < array.length - 1; k++){
+                        int c = array[k];
+                        if (a + b + c == match){
+                            //Log.i("MyInfo"," There is a match in a + b + c");
+                            threeMatch = true;
+                        }
+                        if(twoMatch && threeMatch && fourMatch){
+                            break;
+                        }
+
+                        for (int l = 3; l < array.length; l++){
+                            int d = array[l];
+                                if (a + b + c + d == match){
+                                    fourMatch = true;
+                                }
+                                    if (twoMatch && threeMatch && fourMatch){
+                                        break;
+                                    }
+                        }
+
+                    }
+                }
+            }
+        Log.i("MyInfo","twoMatch" + twoMatch);
+        Log.i("MyInfo","threeMatch" + threeMatch);
+        Log.i("MyInfo","fourMatch" + fourMatch);
+
+
 
     }
 
@@ -238,9 +330,15 @@ public class Game extends Activity implements View.OnClickListener  {
 
     public void createButtonGrid(int high){
 
+        twoMatch = false;
+        threeMatch = false;
+        fourMatch = false;
+
         buttonGrid.removeAllViews();
         buttonGrid.setRowCount(buttonGridColumnRowCount);
         buttonGrid.setColumnCount(buttonGridColumnRowCount);
+
+        int[] sortableArray = new int[(buttonGridColumnRowCount * buttonGridColumnRowCount)];
 
 
             for (int i = 0; i < (buttonGrid.getRowCount() * buttonGrid.getColumnCount()); i++){
@@ -252,6 +350,8 @@ public class Game extends Activity implements View.OnClickListener  {
                 Random rand = new Random();
                 int a = rand.nextInt(blockImages.length);
                 int buttonNum = (finalDisplayNumber) % (rand.nextInt(finalDisplayNumber) + 1) + 1;
+
+                sortableArray[i] = buttonNum;
 
                 button.setBackgroundResource(blockImages[a]);
                 button.setTextSize(textSize);
@@ -279,6 +379,9 @@ public class Game extends Activity implements View.OnClickListener  {
                 buttonGrid.addView(button);
             }
 
+        bubble(sortableArray);
+        findAdditionMatch(sortableArray, finalDisplayNumber);
+
 
     }
 
@@ -290,18 +393,15 @@ public class Game extends Activity implements View.OnClickListener  {
             levelTextView.setText(levelText + level);
             score = 0;
             displayNum = 0;
-            createScoreViewAnimation(scorePlus);
-            createNumDisplayGrid((highestNum * ((level + 1 )/ 2)));
+            answerViewAnimation(numDisplayGrid, highestNum * ((level + 1 )/ 2));
             createButtonGrid(highestNum * ((level + 1) / 2));
             createAdditionDisplay();
             sinceWinClickCounter = 0;
-            //scorePlus.setText("+" + sinceWinClickCounter);
 
         } else if (score > displayNum){
 
             createAdditionViewAnimation(additionTextView);
             level = 0;
-            //levelText = levelText + level;
             levelTextView.setText(levelText + level);
             score = 0;
             displayNum = 0;
@@ -354,21 +454,22 @@ public class Game extends Activity implements View.OnClickListener  {
         ValueAnimator rotateView = ObjectAnimator.ofFloat(view, "Rotation", 360);
         rotateView.setDuration(2000);
 
+        ValueAnimator rotateBackView = ObjectAnimator.ofFloat(view, "Rotation", 0);
+        rotateBackView.setDuration(1000);
+
         ValueAnimator backToX = ObjectAnimator.ofFloat(view, "X", originalX);
         backToX.setDuration(1000);
+
         ValueAnimator backToY = ObjectAnimator.ofFloat(view, "Y", originalY);
         backToY.setDuration(1000);
 
         translateAnimatorSet.play(translateToX).with(translateToY).with(rotateView);
-        translateAnimatorSet.play(backToX).with(backToY).after(rotateView);
-
+        translateAnimatorSet.play(backToX).with(backToY).with(rotateBackView).after(rotateView);
         translateAnimatorSet.start();
     }
 
-    public void createScoreViewAnimation(TextView view) {
 
-        view.setText("+" + Integer.toString(sinceWinClickCounter));
-        view.animate().alpha(1);
+    public void answerViewAnimation(View view, int high){
 
         float originalX = view.getX();
         float originalY = view.getY();
@@ -382,51 +483,20 @@ public class Game extends Activity implements View.OnClickListener  {
         final float endX = (float) dm.widthPixels;
         final float endY = (float) dm.heightPixels;
 
-        AnimatorSet scoreViewSet = new AnimatorSet();
+        AnimatorSet answerSet = new AnimatorSet();
 
+        ValueAnimator moveXOne =ObjectAnimator.ofFloat(view, "X", (float) (endX + view.getWidth()));
+        moveXOne.setDuration(500);
 
-        ObjectAnimator scaleX = ObjectAnimator.ofFloat(view, "ScaleX", 0);
-        scaleX.setDuration(1000);
+        ValueAnimator moveXTwo = ObjectAnimator.ofFloat(view, "X", (float) 0 - view.getWidth(), originalX);
+        moveXTwo.setDuration(500);
 
-        ObjectAnimator scaleBackX = ObjectAnimator.ofFloat(view, "ScaleX", 1);
-        scaleX.setDuration(500);
-
-        ObjectAnimator moveUpX = ObjectAnimator.ofFloat(view, "X", (endX / 2));
-        moveUpX.setDuration(1000);
-
-        ObjectAnimator moveUpY = ObjectAnimator.ofFloat(view, "Y", (endY / 3) * 2);
-        moveUpY.setDuration(1000);
-
-        ObjectAnimator moveToX = ObjectAnimator.ofFloat(view, "X", endX);
-        moveToX.setDuration(1000);
-
-        ObjectAnimator moveToY = ObjectAnimator.ofFloat(view, "Y", endY);
-        moveToY.setDuration(1000);
-
-        ObjectAnimator setAlphaBack = ObjectAnimator.ofFloat(view, "Alpha", 1);
-        setAlphaBack.setDuration(500);
-
-        ObjectAnimator backToX = ObjectAnimator.ofFloat(view, "X", originalX);
-        backToX.setDuration(0);
-
-        ObjectAnimator backToY = ObjectAnimator.ofFloat(view, "Y", originalY);
-        backToY.setDuration(0);
-
-        ObjectAnimator vis = ObjectAnimator.ofFloat(view, "Visibility", 0);
-
-        scoreViewSet.play(moveUpX).with(moveUpY);
-        scoreViewSet.play(moveToX).with(moveToY).after(moveUpY);
-        scoreViewSet.play(backToX).with(backToY).after(moveToY);
-
-        scoreViewSet.start();
-        //view.clearAnimation();
-
-        Log.i("ScoreViewAfter", "" + view.getX());
-        Log.i("ScoreViewAfter", "" + view.getY());
-        Log.i("ScoreViewAfter", "Visibility " + view.getVisibility());
-
- 
+        answerSet.play(moveXOne);
+        createNumDisplayGrid(high);
+        answerSet.play(moveXTwo).after(moveXOne);
+        answerSet.start();
     }
+
 
 
 
