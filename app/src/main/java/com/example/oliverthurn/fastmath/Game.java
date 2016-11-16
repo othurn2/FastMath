@@ -117,11 +117,11 @@ public class Game extends Activity implements View.OnClickListener  {
         scorePlus = (TextView)findViewById(R.id.scorePlusView);
 
         silverMedal = (ImageView)findViewById(R.id.silverMedalView); // Sets the medals on the screen but invisible at the creation time
-        silverMedal.setAlpha(0);
+        silverMedal.setAlpha(0f);
         bronzeMedal = (ImageView)findViewById(R.id.bronzeMedalView);
-        bronzeMedal.setAlpha(0);
+        bronzeMedal.setAlpha(0f);
         goldMedal = (ImageView)findViewById(R.id.goldMedalView);
-        goldMedal.setAlpha(0);
+        goldMedal.setAlpha(0f);
 
         highestNum = 99;
         level = 0;
@@ -372,6 +372,7 @@ public class Game extends Activity implements View.OnClickListener  {
                         button.setClickable(false);
                         button.animate().alpha(0);
                         checkForMatch();
+                        trophyAnimation();
 
                     }
 
@@ -495,6 +496,27 @@ public class Game extends Activity implements View.OnClickListener  {
         createNumDisplayGrid(high);
         answerSet.play(moveXTwo).after(moveXOne);
         answerSet.start();
+    }
+
+    public void trophyAnimation(){
+
+        if (clickCounter >= 2 && twoMatch){
+            goldMedal.setAlpha(0f);
+        } else if (twoMatch && clickCounter < 2){
+            goldMedal.setAlpha(1f);
+        }
+
+        if (threeMatch && clickCounter < 3){
+            silverMedal.setAlpha(1f);
+        } else if (threeMatch && clickCounter <= 3){
+            silverMedal.setAlpha(0f);
+        }
+
+        if (fourMatch && clickCounter < 4){
+            bronzeMedal.setAlpha(1f);
+        } else if (fourMatch && clickCounter >= 4){
+            bronzeMedal.setAlpha(0f);
+        }
     }
 
 

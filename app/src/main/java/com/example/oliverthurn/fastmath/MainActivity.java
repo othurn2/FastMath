@@ -1,7 +1,9 @@
 package com.example.oliverthurn.fastmath;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.provider.ContactsContract;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,15 +13,15 @@ import android.widget.ImageButton;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    protected ImageButton playButton;
-    protected ImageButton quitButton;
+    protected Button playButton;
+    protected Button quitButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        playButton = (ImageButton)findViewById(R.id.playButton);
-        quitButton = (ImageButton)findViewById(R.id.quitButton);
+        playButton = (Button)findViewById(R.id.playButton);
+        quitButton = (Button)findViewById(R.id.exitButton);
         playButton.setOnClickListener(this);
         quitButton.setOnClickListener(this);
         tst();
@@ -43,7 +45,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.playButton:
                 startActivity(new Intent(MainActivity.this, Game.class));
                 break;
-            case R.id.quitButton:
+            case R.id.exitButton:
+                System.exit(0);
                 break;
         }
 

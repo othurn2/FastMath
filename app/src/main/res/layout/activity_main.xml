@@ -18,24 +18,38 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
-    <ImageButton
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/playButton"
+        android:layout_marginTop="52dp"
+        android:layout_marginStart="58dp"
+        android:background="@drawable/playblock"
         android:layout_below="@+id/imageView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="37dp"
-        android:src="@mipmap/playbutton"
-        android:background="#bfe2dd"
-        android:id="@+id/playButton" />
+        android:layout_alignStart="@+id/imageView" />
 
-    <ImageButton
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/quitButton"
-        android:src="@mipmap/quitbutton"
-        android:background="#bfe2dd"
+        android:id="@+id/achievementsButton"
+        android:layout_alignTop="@+id/playButton"
+        android:layout_toEndOf="@+id/playButton"
+        android:background="@drawable/trophyblock" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/settingsButton"
         android:layout_below="@+id/playButton"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp" />
+        android:layout_alignEnd="@+id/playButton"
+        android:background="@drawable/settingblock" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/exitButton"
+        android:layout_below="@+id/playButton"
+        android:layout_toEndOf="@+id/playButton"
+        android:background="@drawable/exitblock" />
 
 </RelativeLayout>
